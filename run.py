@@ -71,8 +71,8 @@ def run(video_snippets):
         print("\nDownloading video snippets...")
         download_video_snippets(video_file_name, links)
         print("\nMerging video snippets...")
-        project_path = f"downloads/{video_file_name}"
-        video_snippets = [VideoFileClip(f"{project_path}/{file}") for file in listdir(project_path) if isfile(join(project_path, file))]
+        path = f"downloads/{video_file_name}"
+        video_snippets = [VideoFileClip(f"{path}/{file}") for file in listdir(path) if isfile(join(path, file))]
         concatenate_video_snippets(video_file_name, video_snippets)
 
 
