@@ -1,22 +1,41 @@
+import youtube_dl
 
-from helpers import _exit
-from helpers import _video_source_allowed
+from os import listdir
+from os.path import isfile, join
 from video_snippets import VideoSnippets
+from moviepy.editor import VideoFileClip
+from moviepy.editor import concatenate_videoclips
+
+
+def concatenate_video_snippets(video_title, video_snippets):
+    output = concatenate_videoclips(video_snippets)
+    output.write_videofile(f"uploads/{video_title}.mp4")
+
+
+def download_video_snippets(project_name, links):
+    with youtube_dl.YoutubeDL(dict(outtmpl=f'downloads/{project_name}/%(id)s.%(ext)s')) as ydl:
+        ydl.download(list(links))
+
+
+def video_source_allowed(video_snippet_url, sources):
+    for source in sources:
+        if source in video_snippet_url:
+            return True
+        else:
+            return False
 
 
 def run(video_snippets):
-    actions = ("view", "add", "remove", "clear", "exit")
+    actions = ("view", "add", "remove", "clear", "x")
     sources = ("clips.twitch.tv", "youtu.be", "youtube.com", "facebook.com", "m.twitch.tv/clip")
 
     while True:
-        action = input("What do you want to do? [view, add, remove, clear, exit] -> ")
+        action = input("What do you want to do? [view, add, remove, clear, x] -> ")
 
         if action not in actions:
             print("Invalid action. Try again.")
-        elif action == 'exit':
-            print("\nNeed help? Send me an email at ngeksdev@gmail.com")
-            print("Goodbye! :) *peepoExit*")
-            _exit()
+        elif action == 'nothing':
+            break
         else:
             data = video_snippets.data()
             if data.empty and action != 'add':
@@ -25,7 +44,7 @@ def run(video_snippets):
                 print(f"\n{video_snippets.data()}\n")
             elif action == 'add':
                 video_snippet_url = input("Clip Link: ")
-                if _video_source_allowed(video_snippet_url, sources):
+                if video_source_allowed(video_snippet_url, sources):
                     video_snippet_title = input("Clip Title: ")
                     video_snippets.add(video_snippet_title, video_snippet_url)
                     print("Video snippet has been added.\n")
@@ -38,6 +57,28 @@ def run(video_snippets):
                     print("Error: Please enter a valid index number.\n")
                 else:
                     print("Product has been removed.\n")
+
+    proceed = input("\nDo you want to proceed? [y, n] -> ")
+    proceed = proceed.lower()
+
+    if proceed == 'n':
+        print("\nNeed help? Send me an email at ngeksdev@gmail.com")
+        print("Goodbye! :peepoExit:")
+    elif proceed == 'y':
+        links = video_snippets.data()['link']
+        if links.empty:
+            print("Your data is empty! :peepoExit:")
+        else:
+            video_title = input("Video Title: ")
+            print("\nDownloading video snippets...")
+            download_video_snippets(video_title, links)
+            print("\nMerging video snippets...")
+            project_path = f"downloads/{video_title}"
+            video_snippets = [VideoFileClip(f"{project_path}/{file}") for file in listdir(project_path) if isfile(join(project_path, file))]
+            concatenate_video_snippets(video_title, video_snippets)
+
+    else:
+        print(":peepoExit:")
 
 
 if __name__ == '__main__':
