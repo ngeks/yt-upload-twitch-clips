@@ -29,3 +29,7 @@ class VideoSnippets:
 
         if not data.empty:
             print(f"\n{data}\n")
+
+    def clear(self):
+        data = self.data()
+        data.iloc[0:0].to_csv(self.data_as_csv, index=False)

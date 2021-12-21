@@ -7,9 +7,9 @@ from moviepy.editor import VideoFileClip
 from moviepy.editor import concatenate_videoclips
 
 
-def concatenate_video_snippets(video_title, video_snippets):
+def concatenate_video_snippets(video_file_name, video_snippets):
     output = concatenate_videoclips(video_snippets)
-    output.write_videofile(f"uploads/{video_title}.mp4")
+    output.write_videofile(f"uploads/{video_file_name}.mp4")
 
 
 def download_video_snippets(project_name, links):
@@ -26,15 +26,15 @@ def video_source_allowed(video_snippet_url, sources):
 
 
 def run(video_snippets):
-    actions = ("view", "add", "remove", "clear", "x")
+    actions = ("view", "add", "remove", "clear", "proceed")
     sources = ("clips.twitch.tv", "youtu.be", "youtube.com", "facebook.com", "m.twitch.tv/clip")
 
     while True:
-        action = input("What do you want to do? [view, add, remove, clear, x] -> ")
+        action = input("What do you want to do? [view, add, remove, clear, proceed] -> ")
 
         if action not in actions:
             print("Invalid action. Try again.")
-        elif action == 'nothing':
+        elif action == 'proceed':
             break
         else:
             data = video_snippets.data()
@@ -57,28 +57,23 @@ def run(video_snippets):
                     print("Error: Please enter a valid index number.\n")
                 else:
                     print("Product has been removed.\n")
+            elif action == 'clear':
+                video_snippets.clear()
+                print("Video snippets has been cleared.\n")
 
-    proceed = input("\nDo you want to proceed? [y, n] -> ")
-    proceed = proceed.lower()
+    # Proceed on downloading and merging video snippets
+    links = video_snippets.data()['link']
 
-    if proceed == 'n':
-        print("\nNeed help? Send me an email at ngeksdev@gmail.com")
-        print("Goodbye! :peepoExit:")
-    elif proceed == 'y':
-        links = video_snippets.data()['link']
-        if links.empty:
-            print("Your data is empty! :peepoExit:")
-        else:
-            video_title = input("Video Title: ")
-            print("\nDownloading video snippets...")
-            download_video_snippets(video_title, links)
-            print("\nMerging video snippets...")
-            project_path = f"downloads/{video_title}"
-            video_snippets = [VideoFileClip(f"{project_path}/{file}") for file in listdir(project_path) if isfile(join(project_path, file))]
-            concatenate_video_snippets(video_title, video_snippets)
-
+    if links.empty:
+        print("Your data is empty! :peepoExit:")
     else:
-        print(":peepoExit:")
+        video_file_name = input("Video File Name: ")
+        print("\nDownloading video snippets...")
+        download_video_snippets(video_file_name, links)
+        print("\nMerging video snippets...")
+        project_path = f"downloads/{video_file_name}"
+        video_snippets = [VideoFileClip(f"{project_path}/{file}") for file in listdir(project_path) if isfile(join(project_path, file))]
+        concatenate_video_snippets(video_file_name, video_snippets)
 
 
 if __name__ == '__main__':
