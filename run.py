@@ -110,9 +110,9 @@ def run(video_snippets):
                             description=video_desc,
                             tags=video_tags))
         except Exception:
-            print("\nSomething went wrong contact developer")
+            print("\nError: Something went wrong contact the developer.")
         else:
-            print("\nVideo is now being uploaded...")
+            print("\nTask: Video is now being uploaded...")
             print("Goodbye! :) :peepoExit:")
 
 
