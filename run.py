@@ -89,7 +89,7 @@ def run(video_snippets):
         print("Your data is empty! :peepoExit:")
     else:
         video_file_name = input("Video File Name: ")
-        video_file_name = '-'.join(video_file_name)
+        video_file_name = video_file_name.replace(' ', '-')
         print("\nTask: Downloading video snippets...")
         download_video_snippets(video_file_name, links)
         print("\nTask: Merging video snippets...")

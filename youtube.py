@@ -68,7 +68,9 @@ def write_timestamps_desc(timestamps, titles):
 
     with open('uploads/description.txt', 'r') as file:
         description = file.read()
-    updated_description = description.replace('[timestamps]', ''.join(timestamp_titles))
+
+    if '[timestamps]' in description:
+        updated_description = description.replace('[timestamps]', ''.join(timestamp_titles))
 
     with open('uploads/description.txt', 'w') as file:
         file.write(updated_description)
