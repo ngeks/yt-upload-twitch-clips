@@ -97,7 +97,7 @@ def run(video_snippets):
         print("\nTask: Set upload parameters")
         timestamps = yt.get_video_timestamps(video_snippets_list)
         yt.write_timestamps_desc(timestamps, titles)
-        category_id = input("Category ID: ")
+        video_category_id = input("Category ID: ")
         video_title = input("Video Title: ")
         video_desc = read_text_file('uploads/description.txt')
         video_tags = read_text_file('uploads/tags.txt')
@@ -105,7 +105,7 @@ def run(video_snippets):
 
         try:
             yt.upload(f"uploads/{today}/{video_file_name}.mp4", dict(
-                            category_id=category_id,
+                            category_id=video_category_id,
                             title=video_title,
                             description=video_desc,
                             tags=video_tags))

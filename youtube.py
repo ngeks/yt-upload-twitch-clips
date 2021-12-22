@@ -27,7 +27,7 @@ def upload(video_file, request):
             snippet=dict(
                 categoryId=request['category_id'],
                 title=request['title'],
-                titledescription=request['description'],
+                description=request['description'],
                 tags=request['tags']
             ),
             status=dict(
