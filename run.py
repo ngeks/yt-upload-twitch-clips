@@ -7,14 +7,33 @@ from moviepy.editor import VideoFileClip
 from moviepy.editor import concatenate_videoclips
 
 
+def set_video_snippets_timestamps():
+    pass
+
+
+def get_video_snippets_duration(video_snippets):
+    video_snippets_duration = []
+    for video_snippet in video_snippets:
+        video_snippets_duration.append(video_snippet.duration)
+    return video_snippets_duration
+
+
+def get_video_snippets(video_snippets_dir):
+    video_snippets = []
+    for video in listdir(video_snippets_dir):
+        if isfile(join(video_snippets_dir, video)):
+            video_snippets.append(VideoFileClip(f"{video_snippets_dir}/{video}", target_resolution=(1080, 1920)))
+    return video_snippets
+
+
 def concatenate_video_snippets(video_file_name, video_snippets):
-    output = concatenate_videoclips(video_snippets)
-    output.write_videofile(f"uploads/{video_file_name}.mp4")
+    output = concatenate_videoclips(video_snippets, method='compose')
+    output.write_videofile(f"uploads/{video_file_name}.mp4", fps=30)
 
 
 def download_video_snippets(project_name, links):
     with youtube_dl.YoutubeDL(dict(outtmpl=f'downloads/{project_name}/%(id)s.%(ext)s')) as ydl:
-        ydl.download(list(links))
+        ydl.download(links)
 
 
 def video_source_allowed(video_snippet_url, sources):
@@ -71,9 +90,10 @@ def run(video_snippets):
         print("\nDownloading video snippets...")
         download_video_snippets(video_file_name, links)
         print("\nMerging video snippets...")
-        path = f"downloads/{video_file_name}"
-        video_snippets = [VideoFileClip(f"{path}/{file}") for file in listdir(path) if isfile(join(path, file))]
-        concatenate_video_snippets(video_file_name, video_snippets)
+        video_snippets_list = get_video_snippets(f"downloads/{video_file_name}")
+        # video_snippets_duration = get_video_snippets_duration(video_snippets)
+        concatenate_video_snippets(video_file_name, video_snippets_list)
+        # upload_video(f"uploads/{video_file_name}")
 
 
 if __name__ == '__main__':
