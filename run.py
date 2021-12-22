@@ -89,6 +89,7 @@ def run(video_snippets):
         print("Your data is empty! :peepoExit:")
     else:
         video_file_name = input("Video File Name: ")
+        video_file_name = '-'.join(video_file_name)
         print("\nTask: Downloading video snippets...")
         download_video_snippets(video_file_name, links)
         print("\nTask: Merging video snippets...")
@@ -109,7 +110,8 @@ def run(video_snippets):
                             title=video_title,
                             description=video_desc,
                             tags=video_tags))
-        except Exception:
+        except Exception as e:
+            print(e)
             print("\nError: Something went wrong contact the developer.")
         else:
             print("\nTask: Video is now being uploaded...")
