@@ -5,17 +5,25 @@ from os.path import isfile, join
 from video_snippets import VideoSnippets
 from moviepy.editor import VideoFileClip
 from moviepy.editor import concatenate_videoclips
+from time import gmtime, strftime
 
 
-def set_video_snippets_timestamps():
-    pass
+def get_video_snippets_timestamps(video_snippets_list):
+    if sum(video_snippets_list) >= 3600:
+        format = '%H:%M:%S'
+    else:
+        format = '%M:%S'
+    timestamps = ['00:00', strftime(format, gmtime(video_snippets_list[0] + 1))]
 
-
-def get_video_snippets_duration(video_snippets):
     video_snippets_duration = []
-    for video_snippet in video_snippets:
+    for video_snippet in video_snippets_list:
         video_snippets_duration.append(video_snippet.duration)
-    return video_snippets_duration
+
+    for idx in range(1, len(video_snippets_list)):
+        ts = video_snippets_list[idx] + video_snippets_list[idx-1]
+        video_snippets_list[idx] = ts
+        timestamps.append(f"{strftime(format, gmtime(ts + 1))}")
+    return timestamps[:-1]
 
 
 def get_video_snippets(video_snippets_dir):
@@ -91,9 +99,9 @@ def run(video_snippets):
         download_video_snippets(video_file_name, links)
         print("\nMerging video snippets...")
         video_snippets_list = get_video_snippets(f"downloads/{video_file_name}")
-        # video_snippets_duration = get_video_snippets_duration(video_snippets)
+        video_snippets_timestamps = get_video_snippets_timestamps(video_snippets_list)
         concatenate_video_snippets(video_file_name, video_snippets_list)
-        # upload_video(f"uploads/{video_file_name}")
+        print(video_snippets_timestamps)
 
 
 if __name__ == '__main__':
