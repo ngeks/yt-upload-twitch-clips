@@ -41,8 +41,7 @@ def video_source_allowed(video_snippet_url, sources):
     for source in sources:
         if source in video_snippet_url:
             return True
-        else:
-            return False
+    return False
 
 
 def run(video_snippets):
