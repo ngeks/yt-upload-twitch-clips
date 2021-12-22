@@ -31,11 +31,11 @@ def upload(video_file, request):
                 tags=request['tags']
             ),
             status=dict(
-                privacyStatus=request['privacy_status'],
+                privacyStatus='public',
                 selfDeclaredMadeForKids=False
             )
         )
-    media = MediaFileUpload(f"uploads/{video_file}")
+    media = MediaFileUpload(video_file)
     return service.videos().insert(
         part='snippet,status',
         body=body,
@@ -59,3 +59,16 @@ def get_video_timestamps(video_snippets_list):
         video_snippets_duration[idx] = ts
         timestamps.append(strftime(format, gmtime(ts + 1)))
     return timestamps[:-1]
+
+
+def write_timestamps_desc(timestamps, titles):
+    timestamp_titles = []
+    for timestamp, title in zip(timestamps, titles):
+        timestamp_titles.append(f"{timestamp} - {title}\n")
+
+    with open('uploads/description.txt', 'r') as file:
+        description = file.read()
+    updated_description = description.replace('[timestamps]', ''.join(timestamp_titles))
+
+    with open('uploads/description.txt', 'w') as file:
+        file.write(updated_description)

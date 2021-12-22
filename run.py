@@ -12,6 +12,11 @@ now = datetime.now()
 today = now.strftime('%Y-%m-%d')
 
 
+def read_text_file(file):
+    with open(file, 'r') as file:
+        return file.read()
+
+
 def get_video_snippets(video_snippets_dir):
     video_snippets = []
     for video in listdir(video_snippets_dir):
@@ -78,6 +83,7 @@ def run(video_snippets):
 
     # Proceed on downloading and merging video snippets
     links = video_snippets.data()['link']
+    titles = video_snippets.data()['title']
 
     if links.empty:
         print("Your data is empty! :peepoExit:")
@@ -90,8 +96,24 @@ def run(video_snippets):
         concatenate_video_snippets(video_file_name, video_snippets_list)
         print("\nTask: Set upload parameters")
         timestamps = yt.get_video_timestamps(video_snippets_list)
-        print(timestamps)
-        # yt.generate_timestamps_desc(timestamps)
+        yt.write_timestamps_desc(timestamps, titles)
+        category_id = input("Category ID: ")
+        video_title = input("Video Title: ")
+        video_desc = read_text_file('uploads/description.txt')
+        video_tags = read_text_file('uploads/tags.txt')
+        print("\nTask: Authenticating video upload...")
+
+        try:
+            yt.upload(f"uploads/{today}/{video_file_name}.mp4", dict(
+                            category_id=category_id,
+                            title=video_title,
+                            description=video_desc,
+                            tags=video_tags))
+        except Exception:
+            print("\nSomething went wrong contact developer")
+        else:
+            print("\nVideo is now being uploaded...")
+            print("Goodbye! :) :peepoExit:")
 
 
 if __name__ == '__main__':
