@@ -1,9 +1,8 @@
-import pandas
-
 from google_auth_oauthlib.flow import InstalledAppFlow as IAF
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from time import gmtime, strftime
+from math import floor
 
 
 SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
@@ -21,7 +20,7 @@ class AuthenticatedService:
         return build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
 
 
-def upload(request, video_file):
+def upload(video_file, request):
     service = AuthenticatedService('client_secret.json')
     service = service.get_authenticated_service()
     body = dict(
@@ -45,22 +44,18 @@ def upload(request, video_file):
 
 
 def get_video_timestamps(video_snippets_list):
-    if sum(video_snippets_list) >= 3600:
+    video_snippets_duration = []
+    for video_snippet in video_snippets_list:
+        video_snippets_duration.append(floor(video_snippet.duration))
+
+    if sum(video_snippets_duration) >= 3600:
         format = '%H:%M:%S'
     else:
         format = '%M:%S'
-    timestamps = ['00:00', strftime(format, gmtime(video_snippets_list[0] + 1))]
+    timestamps = ['00:00', strftime(format, gmtime(video_snippets_duration[0] + 1))]
 
-    video_snippets_duration = []
-    for video_snippet in video_snippets_list:
-        video_snippets_duration.append(video_snippet.duration)
-
-    for idx in range(1, len(video_snippets_list)):
-        ts = video_snippets_list[idx] + video_snippets_list[idx-1]
-        video_snippets_list[idx] = ts
-        timestamps.append(f"{strftime(format, gmtime(ts + 1))}")
+    for idx in range(1, len(video_snippets_duration)):
+        ts = video_snippets_duration[idx] + video_snippets_duration[idx-1]
+        video_snippets_duration[idx] = ts
+        timestamps.append(strftime(format, gmtime(ts + 1)))
     return timestamps[:-1]
-
-
-def generate_timestamps_desc(timestamps, titles):
-    pass

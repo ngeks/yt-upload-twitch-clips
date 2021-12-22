@@ -1,11 +1,15 @@
-import youtube
 import youtube_dl
+import youtube as yt
 
-from os import listdir
-from os.path import isfile, join
+from os import listdir, makedirs
+from os.path import isfile, join, exists
 from video_snippets import VideoSnippets
 from moviepy.editor import VideoFileClip
 from moviepy.editor import concatenate_videoclips
+
+from datetime import datetime
+now = datetime.now()
+today = now.strftime('%Y-%m-%d')
 
 
 def get_video_snippets(video_snippets_dir):
@@ -18,7 +22,9 @@ def get_video_snippets(video_snippets_dir):
 
 def concatenate_video_snippets(video_file_name, video_snippets):
     output = concatenate_videoclips(video_snippets, method='compose')
-    output.write_videofile(f"uploads/{video_file_name}.mp4", fps=30)
+    if not exists(f"uploads/{today}"):
+        makedirs(f"uploads/{today}")
+    output.write_videofile(f"uploads/{today}/{video_file_name}.mp4", fps=30)
 
 
 def download_video_snippets(project_name, links):
@@ -77,14 +83,16 @@ def run(video_snippets):
         print("Your data is empty! :peepoExit:")
     else:
         video_file_name = input("Video File Name: ")
-        print("\nDownloading video snippets...")
+        print("\nTask: Downloading video snippets...")
         download_video_snippets(video_file_name, links)
-        print("\nMerging video snippets...")
+        print("\nTask: Merging video snippets...")
         video_snippets_list = get_video_snippets(f"downloads/{video_file_name}")
         concatenate_video_snippets(video_file_name, video_snippets_list)
-        timestamps = youtube.get_video_timestamps(video_snippets_list)
+        print("\nTask: Set upload parameters")
+        timestamps = yt.get_video_timestamps(video_snippets_list)
         print(timestamps)
-        # youtube.generate_timestamps_desc(timestamps)
+        # yt.generate_timestamps_desc(timestamps)
+
 
 if __name__ == '__main__':
     run(VideoSnippets('video_snippets.csv'))
